@@ -103,11 +103,15 @@ describe("scanDiskConversations", () => {
       "unknown",
       undefined,
       "antigravity-ide",
+      "antigravity-cli",
     ]);
 
-    expect(dirs).toHaveLength(1);
-    expect(dirs[0].replace(/\\/g, "/")).toMatch(
-      /\/\.gemini\/antigravity-ide\/conversations$/,
+    expect(dirs).toHaveLength(2);
+    expect(dirs.map(d => d.replace(/\\/g, "/"))).toContainEqual(
+      expect.stringMatching(/\/\.gemini\/antigravity-ide\/conversations$/)
+    );
+    expect(dirs.map(d => d.replace(/\\/g, "/"))).toContainEqual(
+      expect.stringMatching(/\/\.gemini\/antigravity-cli\/conversations$/)
     );
   });
 

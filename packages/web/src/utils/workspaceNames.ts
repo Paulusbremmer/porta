@@ -28,7 +28,10 @@ export function isAntigravityPlaygroundUri(uri: string): boolean {
   const normalized = safeDecodeUriComponent(uri)
     .replace(/\\/g, "/")
     .toLowerCase();
-  return normalized.includes("/.gemini/antigravity/playground/");
+  return (
+    normalized.includes("/.gemini/antigravity/playground/") ||
+    normalized.includes("/.gemini/antigravity-cli/playground/")
+  );
 }
 
 export function workspaceNameFromMetadata(

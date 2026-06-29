@@ -8,7 +8,7 @@ import type { PlatformAdapter } from "./types.js";
 
 const POWERSHELL = "powershell.exe";
 const DISCOVER_PROCESS_COMMAND =
-  "Get-CimInstance Win32_Process | Where-Object { $_.Name -like 'language_server*' } | Select-Object ProcessId,Name,CommandLine | ConvertTo-Json -Compress";
+  "Get-CimInstance Win32_Process | Where-Object { $_.Name -like 'language_server*' -or $_.Name -like 'agy*' } | Select-Object ProcessId,Name,CommandLine | ConvertTo-Json -Compress";
 
 export const win32Adapter: PlatformAdapter = {
   id: "win32",

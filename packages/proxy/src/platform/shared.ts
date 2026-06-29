@@ -4,7 +4,7 @@ import type { ProcessDiscoveryCandidate } from "./types.js";
 
 const execFileAsync = promisify(execFile);
 const LANGUAGE_SERVER_EXECUTABLE =
-  /(?:^|[\\/])language_server(?:_[^/\\\s"']+)?(?:\.exe)?$/i;
+  /(?:^|[\\/])(?:language_server|agy)(?:_[^/\\\s"']+)?(?:\.exe)?$/i;
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -68,9 +68,18 @@ export function parseCommandCandidate(
     return undefined;
   }
 
-  const csrfToken = parseArgValue(args, "--csrf_token");
-  if (!csrfToken) return undefined;
-  const appDataDir = parseArgValue(args, "--app_data_dir");
+  const isAgy = /(?:^|[\\/])agy(?:\.exe)?$/i.test(executable.trim());
+
+  let csrfToken = parseArgValue(args, "--csrf_token");
+  if (!csrfToken) {
+    if (isAgy) {
+      csrfToken = "";
+    } else {
+      return undefined;
+    }
+  }
+
+  const appDataDir = parseArgValue(args, "--app_data_dir") ?? (isAgy ? "antigravity-cli" : undefined);
 
   return {
     pid,
@@ -150,7 +159,7 @@ export function parseSsPorts(output: string, pid: number): number[] {
   for (const rawLine of output.split("\n")) {
     const line = rawLine.trim();
     if (!line) continue;
-    if (!line.includes(`pid=${pid},`) || !line.includes("language_server")) {
+    if (!line.includes(`pid=${pid},`) || !(line.includes("language_server") || line.includes("agy"))) {
       continue;
     }
 

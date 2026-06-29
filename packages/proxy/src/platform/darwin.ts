@@ -9,7 +9,7 @@ export const darwinAdapter: PlatformAdapter = {
 
     try {
       const comm = await runCommand("ps", ["-p", String(pid), "-o", "comm="]);
-      return comm.includes("language_server");
+      return comm.includes("language_server") || comm.includes("agy");
     } catch {
       return false;
     }

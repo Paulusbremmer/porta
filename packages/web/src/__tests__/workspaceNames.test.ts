@@ -32,6 +32,11 @@ describe("workspace name helpers", () => {
         "file:///c:/Users/deepk/.gemini/antigravity/playground/harmonic-constellation",
       ),
     ).toBe(true);
+    expect(
+      isAntigravityPlaygroundUri(
+        "file:///c:/Users/deepk/.gemini/antigravity-cli/playground/harmonic-constellation",
+      ),
+    ).toBe(true);
     expect(isAntigravityPlaygroundUri("file:///e:/Work/playground")).toBe(
       false,
     );
