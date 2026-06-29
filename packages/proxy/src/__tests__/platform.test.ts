@@ -93,14 +93,42 @@ describe("platform parsing helpers", () => {
     ]);
   });
 
+  it("parses agy processes without csrf_token or port arguments", () => {
+    const output = `
+  123 agy
+  456 /usr/bin/agy
+`;
+    expect(parsePsCandidates(output)).toEqual([
+      {
+        pid: 123,
+        csrfToken: "",
+        workspaceId: undefined,
+        appDataDir: "antigravity-cli",
+        httpsPort: 0,
+        httpPort: 0,
+        lspPort: 0,
+      },
+      {
+        pid: 456,
+        csrfToken: "",
+        workspaceId: undefined,
+        appDataDir: "antigravity-cli",
+        httpsPort: 0,
+        httpPort: 0,
+        lspPort: 0,
+      },
+    ]);
+  });
+
   it("parses ss output for a pid", () => {
     const output = `
 LISTEN 0 4096 127.0.0.1:19222 0.0.0.0:* users:(("language_server",pid=123,fd=9))
 LISTEN 0 4096 127.0.0.1:19223 0.0.0.0:* users:(("language_server",pid=123,fd=10))
+LISTEN 0 4096 127.0.0.1:19224 0.0.0.0:* users:(("agy",pid=123,fd=11))
 LISTEN 0 4096 127.0.0.1:9999 0.0.0.0:* users:(("other",pid=555,fd=9))
 `;
 
-    expect(parseSsPorts(output, 123)).toEqual([19222, 19223]);
+    expect(parseSsPorts(output, 123)).toEqual([19222, 19223, 19224]);
   });
 
   it("parses lsof output for listening ports", () => {

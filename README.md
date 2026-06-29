@@ -5,9 +5,9 @@
 ![Version](https://img.shields.io/badge/version-0.11.0-green)
 
 Remote web interface for [Antigravity](https://antigravity.google/) Agent Manager.  
-Access your local Antigravity sessions from your phone, tablet, or any remote browser through a lightweight LSP bridge.
+Access your local Antigravity sessions (both Antigravity IDE and Antigravity CLI/`agy`) from your phone, tablet, or any remote browser through a lightweight LSP bridge.
 
-Porta is a two-part system: a **proxy** that bridges your local Antigravity Language Server to the network, and a **web UI** (installable PWA) that gives you a mobile-friendly chat interface.
+Porta is a two-part system: a **proxy** that bridges your local Antigravity Language Server (or CLI) to the network, and a **web UI** (installable PWA) that gives you a mobile-friendly chat interface.
 
 <p align="center">
   <img src="docs/screenshot.png" alt="Porta — desktop and mobile" width="720">
@@ -20,7 +20,7 @@ Porta is a two-part system: a **proxy** that bridges your local Antigravity Lang
 ## Quick start
 
 **Prerequisites**: **[Node.js](https://nodejs.org/) ≥ 22**, **[pnpm](https://pnpm.io/) ≥ 10**, and a running
-[Antigravity](https://antigravity.google/) instance.
+[Antigravity](https://antigravity.google/) instance (either the Antigravity IDE or the Antigravity CLI `agy`).
 
 > **Warning:** Porta is a bridge to Antigravity. If Antigravity is not
 > running, the proxy will start but cannot connect to any session.
