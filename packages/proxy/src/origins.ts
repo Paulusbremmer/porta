@@ -51,6 +51,7 @@ export function isAllowedOrigin(
   origin: string,
   allowedOrigins: AllowedOrigin[] = getAllowedOrigins(),
 ): boolean {
+  if (process.env.PORTA_ALLOW_WILDCARD === "1" || allowedOrigins.includes("*")) return true;
   for (const allowed of allowedOrigins) {
     if (typeof allowed === "string" && origin === allowed) {
       return true;
@@ -67,5 +68,6 @@ export function resolveCorsOrigin(
   allowedOrigins: AllowedOrigin[] = getAllowedOrigins(),
 ): string | null | undefined {
   if (!origin) return origin;
+  if (process.env.PORTA_ALLOW_WILDCARD === "1" || allowedOrigins.includes("*")) return "*";
   return isAllowedOrigin(origin, allowedOrigins) ? origin : null;
 }
