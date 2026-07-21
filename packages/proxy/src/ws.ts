@@ -103,7 +103,7 @@ export function shouldActivateIdlePolling(
 ): boolean {
   return (
     status === "CASCADE_RUN_STATUS_RUNNING" ||
-    (totalStepCount ?? 0) > lastStepCount
+    (totalStepCount !== undefined && totalStepCount !== lastStepCount)
   );
 }
 
@@ -413,8 +413,12 @@ export function setupWebSocket(
             true,
           )) as { status?: string };
           return TERMINAL_STATUSES.has(data.status ?? "");
-        } catch {
-          return false; // RPC failure — stay active to be safe
+        } catch (err: any) {
+          // If the trajectory doesn't exist anymore, we are definitely done.
+          if (err && err.code === "not_found") {
+            return true;
+          }
+          return false; // Other RPC failure (e.g. unavailable) — stay active to be safe
         }
       };
 

@@ -12,6 +12,14 @@ const ALLOWED_TYPES = [
   "image/webp",
 ];
 
+const SLASH_COMMANDS = [
+  { name: "/goal", description: "Run a long-running task thoroughly until completion" },
+  { name: "/schedule", description: "Run an instruction on a recurring schedule or set a timer" },
+  { name: "/grill-me", description: "Interactive interview to resolve design decisions" },
+  { name: "/teamwork-preview", description: "Use a team of agents for a large project" },
+  { name: "/learn", description: "Persist current behaviors for future tasks" },
+];
+
 export type PlannerType = "conversational" | "planning";
 
 interface Props {
@@ -141,6 +149,22 @@ export function ChatInput({
     el.style.height = Math.min(el.scrollHeight, 200) + "px";
   }, [draft]);
 
+  const [autocompleteIndex, setAutocompleteIndex] = useState(0);
+
+  const matchedCommands = draft.startsWith("/")
+    ? SLASH_COMMANDS.filter((c) => c.name.startsWith(draft))
+    : [];
+  const showAutocomplete = matchedCommands.length > 0 && draft !== matchedCommands[0].name;
+
+  useEffect(() => {
+    setAutocompleteIndex(0);
+  }, [draft]);
+
+  const insertCommand = useCallback((cmd: string) => {
+    onDraftChange(cmd + " ");
+    textareaRef.current?.focus();
+  }, [onDraftChange]);
+
   const showFileError = useCallback((msg: string) => {
     setFileError(msg);
     if (fileErrorTimer.current) clearTimeout(fileErrorTimer.current);
@@ -221,6 +245,23 @@ export function ChatInput({
   const inputDisabled = disabled || isPreparingAttachments;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (showAutocomplete) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setAutocompleteIndex((i) => (i + 1) % matchedCommands.length);
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setAutocompleteIndex((i) => (i - 1 + matchedCommands.length) % matchedCommands.length);
+        return;
+      }
+      if (e.key === "Enter" || e.key === "Tab") {
+        e.preventDefault();
+        insertCommand(matchedCommands[autocompleteIndex].name);
+        return;
+      }
+    }
     if (e.key === "Enter" && !e.shiftKey) {
       // On mobile, Enter inserts a newline — send via button only
       if (window.innerWidth <= 480 || inputDisabled) return;
@@ -334,7 +375,41 @@ export function ChatInput({
           }
         }}
       >
-        <div className="chat-input-top">
+        <div className="chat-input-top" style={{ position: "relative" }}>
+          {showAutocomplete && (
+            <div className="slash-autocomplete" style={{
+              position: "absolute",
+              bottom: "100%",
+              left: 0,
+              backgroundColor: "var(--bg-secondary)",
+              border: "1px solid var(--border-color)",
+              borderRadius: "8px",
+              padding: "4px",
+              marginBottom: "8px",
+              zIndex: 10,
+              width: "300px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+            }}>
+              {matchedCommands.map((cmd, i) => (
+                <div
+                  key={cmd.name}
+                  onClick={() => insertCommand(cmd.name)}
+                  style={{
+                    padding: "8px",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                    backgroundColor: i === autocompleteIndex ? "var(--bg-hover)" : "transparent",
+                    display: "flex",
+                    flexDirection: "column"
+                  }}
+                  onMouseEnter={() => setAutocompleteIndex(i)}
+                >
+                  <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{cmd.name}</span>
+                  <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{cmd.description}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <textarea
             ref={textareaRef}
             className="chat-input"

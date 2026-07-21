@@ -249,6 +249,7 @@ export async function discoverOwnerInstance(
     );
     if (wsOwners.length > 0) {
       wsOwners.sort((a, b) => b.stepCount - a.stepCount);
+      conversationInstanceAffinity.set(cascadeId, wsOwners[0].inst);
       return wsOwners[0].inst;
     }
 
@@ -363,7 +364,18 @@ export async function resolveAndCall<T>(
     }
   }
 
-  // Try the affinity LS first
+  // Discover owner: query all LSes for trajectory summaries.
+  // Pass readOnly so heuristic fallback (RUNNING/stepCount) is only used
+  // for reads. Writes get null when workspace metadata is unavailable.
+  const owner = await discoverOwnerInstance(cascadeId, instances, readOnly);
+  if (owner) {
+    const data = await rpc.call<T>(method, body, owner);
+    return { data, instance: owner };
+  }
+
+  // Fallback to workspace affinity if the conversation is not in any LS memory
+  // (e.g. it was unloaded or the daemon restarted). This routes the request to
+  // an LS that owns the workspace, which will load the .pb file from disk.
   const wsId = conversationAffinity.get(cascadeId);
   if (wsId) {
     const normalWsId = normalizeWorkspaceId(wsId);
@@ -373,6 +385,7 @@ export async function resolveAndCall<T>(
     if (preferred) {
       try {
         const data = await rpc.call<T>(method, body, preferred);
+        conversationInstanceAffinity.set(cascadeId, preferred);
         return { data, instance: preferred };
       } catch (err) {
         if (
@@ -387,15 +400,6 @@ export async function resolveAndCall<T>(
         }
       }
     }
-  }
-
-  // Discover owner: query all LSes for trajectory summaries.
-  // Pass readOnly so heuristic fallback (RUNNING/stepCount) is only used
-  // for reads. Writes get null when workspace metadata is unavailable.
-  const owner = await discoverOwnerInstance(cascadeId, instances, readOnly);
-  if (owner) {
-    const data = await rpc.call<T>(method, body, owner);
-    return { data, instance: owner };
   }
 
   // Fallback for read-only operations: conversation not in any LS's memory
