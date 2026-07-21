@@ -91,20 +91,28 @@
   /* ── Message bubbles ── */
 
   .message-body {
-    padding: 4px 10px;
+    padding: 10px 14px;
     font-size: 16px;
-    line-height: 1.55;
+    line-height: 1.6;
+    border-radius: 12px;
   }
 
   .message.user .message-body {
     max-width: 85%;
+    border-radius: 16px 16px 4px 16px;
+    background: var(--bg-hover);
+  }
+
+  .message.assistant .message-body {
+    border-radius: 16px 16px 16px 4px;
   }
 
   .message-body pre {
-    padding: 10px 12px;
+    padding: 12px 14px;
     font-size: 14px;
-    margin: 6px -4px;
+    margin: 8px -6px;
     border-radius: var(--radius-sm);
+    -webkit-overflow-scrolling: touch;
   }
 
   .message-body code {
@@ -180,7 +188,7 @@
   /* ── Chat input area ── */
 
   .chat-input-area {
-    padding: 6px 10px 12px;
+    padding: 8px 10px calc(12px + env(safe-area-inset-bottom));
   }
 
   .model-selector-btn {
@@ -195,6 +203,7 @@
     padding: 12px 12px 10px;
     border-radius: var(--radius-md);
     gap: 12px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
   }
 
   .chat-input {
@@ -203,14 +212,15 @@
   }
 
   .chat-send-btn, .chat-stop-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    border-radius: 50%;
   }
 
   .chat-action-icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   /* ── Step cards ── */
